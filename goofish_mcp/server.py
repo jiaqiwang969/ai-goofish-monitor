@@ -1,6 +1,7 @@
 import asyncio
 import json
 import os
+import sys
 import traceback
 from typing import Any, Dict, List, Optional
 
@@ -212,6 +213,10 @@ def _handle_tools_call(msg: Dict[str, Any]) -> Dict[str, Any]:
 
 
 def serve() -> None:
+    # Important: never print to stdout here (stdout is reserved for MCP messages).
+    # Stderr is safe for human-readable logs.
+    sys.stderr.write(f"goofish-mcp {__version__}: started (stdio). Waiting for MCP client...\n")
+    sys.stderr.flush()
     while True:
         msg = read_message()
         if msg is None:
@@ -247,4 +252,3 @@ def serve() -> None:
 
 
 __all__ = ["serve"]
-
