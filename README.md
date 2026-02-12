@@ -42,7 +42,7 @@ python3 -m goofish_mcp
 仓库根目录提供了 `package.json` + `bin/goofish-mcp`，可用：
 
 ```bash
-npx -y github:jiaqiwang969/ai-goofish-monitor#main
+npx -y github:jiaqiwang969/ai-goofish-monitor#master
 ```
 
 > 注意：`npx` 只是一个 launcher，真正执行的是 `python3 -m goofish_mcp`。
@@ -71,4 +71,3 @@ args = ["-m", "goofish_mcp"]
 startup_timeout_sec = 30
 tool_timeout_sec = 3600
 ```
-
