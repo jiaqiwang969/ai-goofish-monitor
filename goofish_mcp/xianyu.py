@@ -357,7 +357,16 @@ async def search(
         params = {"q": query}
         search_url = f"https://www.goofish.com/search?{urlencode(params)}"
 
-        async with page.expect_response(lambda r: API_URL_PATTERN in r.url, timeout=30000) as response_info:
+        # The page may trigger multiple `pc.search` calls (e.g., home prefetch) that return empty
+        # lists. The "real" search request includes `keyword` in its POST body.
+        def _is_real_search_response(r: Any) -> bool:
+            try:
+                body = (r.request.post_data or "") if getattr(r, "request", None) is not None else ""
+            except Exception:
+                body = ""
+            return (API_URL_PATTERN in r.url) and ("keyword" in body)
+
+        async with page.expect_response(_is_real_search_response, timeout=30000) as response_info:
             await page.goto(search_url, wait_until="domcontentloaded", timeout=60000)
         resp = await response_info.value
         data = await resp.json()

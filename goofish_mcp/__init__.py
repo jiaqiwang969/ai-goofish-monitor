@@ -8,4 +8,4 @@ This fork intentionally keeps only the "hands" part:
 All "buy / don't buy" decisions are meant to be done by the MCP client (Codex).
 """
 
-__version__ = "0.1.1"
+__version__ = "0.1.2"
