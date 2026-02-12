@@ -1,0 +1,14 @@
+#!/usr/bin/env node
+
+const { spawn } = require("child_process");
+
+// MCP servers communicate over stdio; we just forward to python.
+const python = process.env.GOOFISH_PYTHON || "python3";
+const args = ["-m", "goofish_mcp", ...process.argv.slice(2)];
+
+const proc = spawn(python, args, { stdio: "inherit" });
+
+proc.on("exit", (code) => {
+  process.exit(code == null ? 1 : code);
+});
+

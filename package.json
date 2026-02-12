@@ -1,0 +1,17 @@
+{
+  "name": "goofish-mcp",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Minimal Xianyu (Goofish) MCP server: login-state import + search + listing detail",
+  "bin": {
+    "goofish-mcp": "bin/goofish-mcp"
+  },
+  "files": [
+    "bin/",
+    "goofish_mcp/",
+    "chrome-extension/",
+    "README.md",
+    "LICENSE"
+  ]
+}
+
