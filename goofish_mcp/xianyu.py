@@ -165,6 +165,20 @@ def _pick_channel() -> Optional[str]:
 
 
 async def _new_browser_and_context(state_file: str, headless: bool, proxy_server: Optional[str]) -> Any:
+    # Ensure Playwright runtime exists. This is intentionally blocking so tool calls
+    # can "just work" on a fresh machine when Codex starts the MCP server.
+    try:
+        from goofish_mcp.runtime_setup import ensure_runtime_ready
+
+        if not ensure_runtime_ready():
+            raise RuntimeError("auto-setup failed")
+    except Exception as e:
+        raise RuntimeError(
+            "Playwright runtime is not ready. Auto-setup may have failed.\n"
+            "Hint: check `xianyu_healthcheck` output, or run:\n"
+            "  npx -y --package github:jiaqiwang969/ai-goofish-monitor#main goofish-mcp-setup"
+        ) from e
+
     try:
         from playwright.async_api import async_playwright  # type: ignore
     except Exception as e:  # pragma: no cover

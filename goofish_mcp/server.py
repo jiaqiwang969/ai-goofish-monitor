@@ -6,6 +6,7 @@ import traceback
 from typing import Any, Dict, List, Optional
 
 from goofish_mcp import __version__
+from goofish_mcp.runtime_setup import probe_runtime, start_background_setup
 from goofish_mcp.stdio import read_message, write_message
 from goofish_mcp.xianyu import RiskControlError, get_listing, search, write_login_state
 
@@ -162,24 +163,19 @@ def _handle_tools_call(msg: Dict[str, Any]) -> Dict[str, Any]:
 
         if name == "xianyu_healthcheck":
             state_file = os.getenv("GOOFISH_STATE_FILE") or os.path.join("state", "xianyu_state.json")
-            playwright_available = True
-            try:
-                import playwright  # type: ignore  # noqa: F401
-            except Exception:
-                playwright_available = False
-
             return _jsonrpc_result(
                 msg_id,
                 _tool_text(
                     {
                         "ok": True,
-                        "playwright_installed": playwright_available,
                         "default_state_file": state_file,
                         "default_state_file_exists": os.path.exists(state_file),
+                        "runtime": probe_runtime(),
                         "env": {
                             "GOOFISH_STATE_FILE": os.getenv("GOOFISH_STATE_FILE"),
                             "GOOFISH_RUN_HEADLESS": os.getenv("GOOFISH_RUN_HEADLESS"),
                             "GOOFISH_BROWSER_CHANNEL": os.getenv("GOOFISH_BROWSER_CHANNEL"),
+                            "GOOFISH_AUTO_SETUP": os.getenv("GOOFISH_AUTO_SETUP"),
                         },
                     }
                 ),
@@ -217,6 +213,12 @@ def serve() -> None:
     # Stderr is safe for human-readable logs.
     sys.stderr.write(f"goofish-mcp {__version__}: started (stdio). Waiting for MCP client...\n")
     sys.stderr.flush()
+    try:
+        # Do not block startup: install Playwright in background if needed.
+        start_background_setup()
+    except Exception as e:
+        sys.stderr.write(f"[goofish-mcp] auto-setup init failed: {type(e).__name__}: {e}\n")
+        sys.stderr.flush()
     while True:
         msg = read_message()
         if msg is None:

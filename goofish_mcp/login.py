@@ -31,7 +31,9 @@ async def run_login(out_path: str, channel: Optional[str] = None) -> str:
         from playwright.async_api import async_playwright  # type: ignore
     except Exception as e:  # pragma: no cover
         raise RuntimeError(
-            "Playwright is not installed. Run:\n"
+            "Playwright is not ready yet.\n"
+            "If you started goofish-mcp via Codex, it will auto-install in the background on first run.\n"
+            "Otherwise run:\n"
             "  npx -y --package github:jiaqiwang969/ai-goofish-monitor#main goofish-mcp-setup\n"
             "Then retry login."
         ) from e
@@ -101,4 +103,3 @@ def main(argv: Optional[list] = None) -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

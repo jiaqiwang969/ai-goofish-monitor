@@ -13,6 +13,18 @@
 - Python 3.9+
 - Playwright (Python)
 
+## 零手动安装（推荐）
+
+只要你把 goofish MCP 配到 `~/.codex/config.toml`，Codex 启动时会拉起 MCP server，
+server 会在后台自动检查并安装（仅在缺失时才安装）：
+
+- `pip install playwright`（用户目录）
+- `playwright install chromium`
+
+第一次可能需要几分钟下载浏览器；装好以后会自动跳过。
+
+> 如需禁用：`GOOFISH_AUTO_SETUP=0`
+
 ```bash
 pip install -r requirements.txt
 playwright install chromium
@@ -95,6 +107,7 @@ tool_timeout_sec = 3600
 [mcp_servers.goofish.env]
 GOOFISH_STATE_FILE = "/Users/jqwang/.codex/goofish/xianyu_state.json"
 PYTHONPYCACHEPREFIX = "/tmp/pycache-goofish"
+GOOFISH_AUTO_SETUP = "1"
 # 可选：尽量让 npm/npx 安静一点，避免 stdout 污染（MCP stdio 只能输出 JSON）。
 NO_UPDATE_NOTIFIER = "1"
 npm_config_update_notifier = "false"
