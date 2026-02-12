@@ -18,6 +18,14 @@ pip install -r requirements.txt
 playwright install chromium
 ```
 
+### 一键安装（推荐，npx 方式）
+
+如果你不想手动 pip / playwright install，可以直接运行：
+
+```bash
+npx -y --package github:jiaqiwang969/ai-goofish-monitor#main goofish-mcp-setup
+```
+
 ## 登录态 JSON（推荐）
 
 使用闲鱼登录态导出扩展获取 JSON 后，有两种方式提供给 MCP：

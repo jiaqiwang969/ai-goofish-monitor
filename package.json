@@ -4,7 +4,8 @@
   "private": true,
   "description": "Minimal Xianyu (Goofish) MCP server: login-state import + search + listing detail",
   "bin": {
-    "goofish-mcp": "bin/goofish-mcp"
+    "goofish-mcp": "bin/goofish-mcp",
+    "goofish-mcp-setup": "bin/goofish-mcp-setup"
   },
   "files": [
     "bin/",
@@ -14,4 +15,3 @@
     "LICENSE"
   ]
 }
-

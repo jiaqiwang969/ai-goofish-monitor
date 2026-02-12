@@ -1,0 +1,26 @@
+#!/usr/bin/env node
+
+const { spawnSync } = require("child_process");
+
+function run(cmd, args) {
+  const res = spawnSync(cmd, args, { stdio: "inherit" });
+  if (res.error) {
+    throw res.error;
+  }
+  if (typeof res.status === "number" && res.status !== 0) {
+    process.exit(res.status);
+  }
+}
+
+const python = process.env.GOOFISH_PYTHON || "python3";
+
+console.log(`[goofish-mcp-setup] Using python: ${python}`);
+
+// 1) Install/upgrade playwright python package (user site to avoid sudo).
+run(python, ["-m", "pip", "install", "--user", "-U", "playwright"]);
+
+// 2) Install Chromium browser used by Playwright.
+run(python, ["-m", "playwright", "install", "chromium"]);
+
+console.log("[goofish-mcp-setup] Done.");
+
