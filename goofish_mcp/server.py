@@ -72,7 +72,7 @@ TOOLS: List[Dict[str, Any]] = [
     },
     {
         "name": "xianyu_get_listing",
-        "description": "Open a listing URL and return detail fields (title/desc/images/seller/raw).",
+        "description": "Open a listing URL and return detail fields (title/desc/images/seller).",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -80,6 +80,11 @@ TOOLS: List[Dict[str, Any]] = [
                 "state_file": {"type": "string", "description": "Override login-state JSON file path."},
                 "headless": {"type": "boolean", "description": "Run browser headless (default from env)."},
                 "proxy_server": {"type": "string", "description": "Playwright proxy server, e.g. http://127.0.0.1:7890"},
+                "include_raw": {
+                    "type": "boolean",
+                    "description": "Include large raw fields (debug). Defaults to false to keep output small.",
+                    "default": False,
+                },
             },
             "required": ["url"],
         },
@@ -151,12 +156,14 @@ def _handle_tools_call(msg: Dict[str, Any]) -> Dict[str, Any]:
             state_file = arguments.get("state_file")
             headless = arguments.get("headless")
             proxy_server = arguments.get("proxy_server")
+            include_raw = arguments.get("include_raw", False)
             result = asyncio.run(
                 get_listing(
                     url=url.strip(),
                     state_file=state_file if isinstance(state_file, str) else None,
                     headless=headless if isinstance(headless, bool) else None,
                     proxy_server=proxy_server if isinstance(proxy_server, str) else None,
+                    include_raw=bool(include_raw),
                 )
             )
             return _jsonrpc_result(msg_id, _tool_text(result))

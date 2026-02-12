@@ -391,7 +391,7 @@ async def search(
         await _close_browser(p, browser, context)
 
 
-def _parse_listing_detail(detail_json: dict, url: str) -> Dict[str, Any]:
+def _parse_listing_detail(detail_json: dict, url: str, include_raw: bool = False) -> Dict[str, Any]:
     data = detail_json.get("data") or {}
     item_do = data.get("itemDO") or {}
     seller_do = data.get("sellerDO") or {}
@@ -414,7 +414,7 @@ def _parse_listing_detail(detail_json: dict, url: str) -> Dict[str, Any]:
     zhima = ((seller_do.get("zhimaLevelInfo") or {}) if isinstance(seller_do.get("zhimaLevelInfo"), dict) else {})
     zhima_level = zhima.get("levelName")
 
-    return {
+    out: Dict[str, Any] = {
         "url": url,
         "title": title,
         "description": desc,
@@ -425,10 +425,12 @@ def _parse_listing_detail(detail_json: dict, url: str) -> Dict[str, Any]:
             "seller_id": seller_id,
             "nick": seller_nick,
             "zhima_level": zhima_level,
-            "raw": seller_do,
         },
-        "raw": item_do,
     }
+    if include_raw:
+        out["seller"]["raw"] = seller_do
+        out["raw"] = item_do
+    return out
 
 
 async def get_listing(
@@ -436,6 +438,7 @@ async def get_listing(
     state_file: Optional[str] = None,
     headless: Optional[bool] = None,
     proxy_server: Optional[str] = None,
+    include_raw: bool = False,
 ) -> Dict[str, Any]:
     state_path = _resolve_state_file(state_file)
     if not os.path.exists(state_path):
@@ -463,7 +466,7 @@ async def get_listing(
         if "FAIL_SYS_USER_VALIDATE" in ret:
             raise RiskControlError("FAIL_SYS_USER_VALIDATE")
 
-        return _parse_listing_detail(detail_json, url=url)
+        return _parse_listing_detail(detail_json, url=url, include_raw=bool(include_raw))
     except Exception as e:
         if e.__class__.__name__ == "TimeoutError":
             raise TimeoutError(f"timeout while opening url={url!r}") from e

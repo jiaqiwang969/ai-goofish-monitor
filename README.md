@@ -90,7 +90,7 @@ npx -y github:jiaqiwang969/ai-goofish-monitor#main
 
 - `xianyu_write_login_state(content, path?)`
 - `xianyu_search(query, limit?, state_file?, headless?, proxy_server?)`
-- `xianyu_get_listing(url, state_file?, headless?, proxy_server?)`
+- `xianyu_get_listing(url, state_file?, headless?, proxy_server?, include_raw?)`
 - `xianyu_healthcheck()`
 
 ## Codex 配置示例
