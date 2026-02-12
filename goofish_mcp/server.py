@@ -243,9 +243,15 @@ def serve() -> None:
             continue
 
         # Resources/Prompts are intentionally not implemented in this minimal fork.
-        if method in {"resources/list", "prompts/list"}:
-            key = "resources" if method.startswith("resources/") else "prompts"
-            write_message(_jsonrpc_result(msg_id, {key: []}))
+        # Still, we return empty lists for compatibility with MCP clients that probe them.
+        if method == "resources/list":
+            write_message(_jsonrpc_result(msg_id, {"resources": [], "nextCursor": None}))
+            continue
+        if method == "resources/templates/list":
+            write_message(_jsonrpc_result(msg_id, {"resourceTemplates": [], "nextCursor": None}))
+            continue
+        if method == "prompts/list":
+            write_message(_jsonrpc_result(msg_id, {"prompts": [], "nextCursor": None}))
             continue
 
         write_message(_jsonrpc_error(msg_id, -32601, f"Method not found: {method!r}"))

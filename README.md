@@ -26,6 +26,19 @@ playwright install chromium
 npx -y --package github:jiaqiwang969/ai-goofish-monitor#main goofish-mcp-setup
 ```
 
+## 最省事的登录方式（推荐：Playwright 打开真实浏览器，让你手动登录）
+
+如果你不想装/加载浏览器扩展，直接用下面命令打开一个浏览器窗口，自己扫码/短信登录，然后回到终端按回车即可：
+
+```bash
+npx -y --package github:jiaqiwang969/ai-goofish-monitor#main goofish-mcp-login
+```
+
+它会把 Playwright 的 `storage_state` JSON 写到：
+
+- `$GOOFISH_STATE_FILE`（如果你设置了）
+- 否则 `~/.codex/goofish/xianyu_state.json`
+
 ## 登录态 JSON（推荐）
 
 使用闲鱼登录态导出扩展获取 JSON 后，有两种方式提供给 MCP：
@@ -74,8 +87,18 @@ npx -y github:jiaqiwang969/ai-goofish-monitor#main
 
 ```toml
 [mcp_servers.goofish]
-command = "python3"
-args = ["-m", "goofish_mcp"]
-startup_timeout_sec = 30
+command = "npx"
+args = ["-y", "--package", "github:jiaqiwang969/ai-goofish-monitor#main", "--", "goofish-mcp"]
+startup_timeout_sec = 60
 tool_timeout_sec = 3600
+
+[mcp_servers.goofish.env]
+GOOFISH_STATE_FILE = "/Users/jqwang/.codex/goofish/xianyu_state.json"
+PYTHONPYCACHEPREFIX = "/tmp/pycache-goofish"
+# 可选：尽量让 npm/npx 安静一点，避免 stdout 污染（MCP stdio 只能输出 JSON）。
+NO_UPDATE_NOTIFIER = "1"
+npm_config_update_notifier = "false"
+npm_config_loglevel = "error"
+npm_config_fund = "false"
+npm_config_audit = "false"
 ```

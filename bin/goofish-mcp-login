@@ -1,0 +1,24 @@
+#!/usr/bin/env node
+
+const { spawn } = require("child_process");
+const path = require("path");
+
+// Runs interactive login helper (writes Playwright storage_state JSON).
+const python = process.env.GOOFISH_PYTHON || "python3";
+const args = ["-m", "goofish_mcp.login", ...process.argv.slice(2)];
+
+// Ensure python can import `goofish_mcp` even when executed from outside the package dir (e.g. via npx).
+const pkgRoot = path.join(__dirname, "..");
+const pyPathKey = "PYTHONPATH";
+const oldPyPath = process.env[pyPathKey];
+const newPyPath = oldPyPath ? `${pkgRoot}${path.delimiter}${oldPyPath}` : pkgRoot;
+
+const proc = spawn(python, args, {
+  stdio: "inherit",
+  env: { ...process.env, [pyPathKey]: newPyPath },
+});
+
+proc.on("exit", (code) => {
+  process.exit(code == null ? 1 : code);
+});
+

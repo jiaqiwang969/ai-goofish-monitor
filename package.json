@@ -5,6 +5,7 @@
   "description": "Minimal Xianyu (Goofish) MCP server: login-state import + search + listing detail",
   "bin": {
     "goofish-mcp": "bin/goofish-mcp",
+    "goofish-mcp-login": "bin/goofish-mcp-login",
     "goofish-mcp-setup": "bin/goofish-mcp-setup"
   },
   "files": [
