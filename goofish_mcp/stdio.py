@@ -14,45 +14,29 @@ def _readline() -> Optional[str]:
 
 
 def read_message() -> Optional[Dict[str, Any]]:
-    """Read a single MCP/JSON-RPC message using Content-Length framing."""
-    headers: Dict[str, str] = {}
+    """Read a single JSON-RPC message (one JSON object per line).
 
+    Codex's `rmcp` transport uses newline-delimited JSON for stdio.
+    """
     while True:
         line = _readline()
         if line is None:
             return None
-        # MCP uses \r\n, but be tolerant.
         stripped = line.strip()
         if stripped == "":
-            break
-        if ":" not in stripped:
-            # Skip malformed header line.
             continue
-        key, value = stripped.split(":", 1)
-        headers[key.strip().lower()] = value.strip()
-
-    length_str = headers.get("content-length")
-    if not length_str:
-        return None
-    try:
-        length = int(length_str)
-    except ValueError:
-        return None
-
-    body = sys.stdin.buffer.read(length)
-    if not body:
-        return None
-    try:
-        payload = body.decode("utf-8")
-    except UnicodeDecodeError:
-        payload = body.decode("utf-8", errors="replace")
-    return json.loads(payload)
+        try:
+            return json.loads(stripped)
+        except json.JSONDecodeError:
+            # Keep MCP stdout clean; log parse issues to stderr and keep reading.
+            sys.stderr.write(f"[goofish-mcp] invalid json line ignored: {stripped[:200]}\n")
+            sys.stderr.flush()
 
 
 def write_message(message: Dict[str, Any]) -> None:
-    """Write a single MCP/JSON-RPC message using Content-Length framing."""
-    data = json.dumps(message, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
-    sys.stdout.buffer.write(f"Content-Length: {len(data)}\r\n\r\n".encode("utf-8"))
-    sys.stdout.buffer.write(data)
+    """Write a single JSON-RPC message (one JSON object per line)."""
+    data = json.dumps(message, ensure_ascii=False, separators=(",", ":"))
+    sys.stdout.buffer.write(data.encode("utf-8"))
+    sys.stdout.buffer.write(b"\n")
     sys.stdout.buffer.flush()
 
